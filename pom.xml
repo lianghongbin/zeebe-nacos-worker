@@ -7,29 +7,16 @@
     <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <parent>
-        <groupId>org.camunda</groupId>
-        <artifactId>camunda-release-parent</artifactId>
-        <version>3.8.1</version>
-        <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
-        <relativePath />
-    </parent>
-
     <properties>
         <version.zeebe>1.1.2</version.zeebe>
         <version.zeebe.spring>1.1.0</version.zeebe.spring>
         <version.spring.boot>2.5.4</version.spring.boot>
 
-        <!-- release parent settings -->
         <version.java>11</version.java>
-        <java.version>${version.java}</java.version>
-
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-
-        <plugin.version.javadoc>3.1.1</plugin.version.javadoc>
-        <!-- disable jdk8 javadoc checks on release build -->
-        <additionalparam>-Xdoclint:none</additionalparam>
+        <!-- release parent settings -->
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencyManagement>
@@ -44,7 +31,21 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${version.spring.boot}</version>
+                <version>2.3.0.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>0.2.2.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Finchley.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -81,12 +82,20 @@
             </exclusions>
         </dependency>
 
+        <!-- nacos-config 依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <!--
-            <version>2.9.9</version>
-             -->
         </dependency>
 
         <dependency>
@@ -135,101 +144,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
-                    <source>${version.java}</source>
+                    <source>${java.version}</source>
                 </configuration>
             </plugin>
-
             <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.1.4</version>
-                <executions>
-                    <execution>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <to>
-                        <image>ghcr.io/camunda-community-hub/zeebe-http-worker</image>
-                        <tags>${project.version}</tags>
-                    </to>
-                    <container>
-                        <ports>
-                            <port>8080</port>
-                        </ports>
-                    </container>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
             </plugin>
-
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>community-action-maven-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- Prevent gpg from using pinentry programs -->
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <repositories>
-        <repository>
-            <id>zeebe</id>
-            <name>Zeebe Repository</name>
-            <url>https://app.camunda.com/nexus/content/repositories/zeebe-io/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>zeebe-snapshots</id>
-            <name>Zeebe Snapshot Repository</name>
-            <url>https://app.camunda.com/nexus/content/repositories/zeebe-io-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <scm>
-        <url>https://github.com/camunda-community-hub/zeebe-http-worker</url>
-        <connection>scm:git:git@github.com:camunda-community-hub/zeebe-http-worker.git</connection>
-        <developerConnection>scm:git:git@github.com:camunda-community-hub/zeebe-http-worker.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
 </project>

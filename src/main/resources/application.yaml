@@ -1,13 +1,14 @@
 zeebe:
   client:
     worker:
-      defaultName: http-worker
-      defaultType: http
+      defaultName: nacos-worker
+      defaultType: nacos_service
       threads: 3
 
     job.timeout: 120000
-    broker.contactPoint: 127.0.0.1:26500
     security.plaintext: true
+    broker:
+      gateway-address: 10.0.1.198:26500
 
 logging:
   level:
@@ -18,3 +19,15 @@ logging:
 management:
   server:
     port: 8080
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.0.1.198:8848
+        metadata:
+          find: /order/find
+          add: /order/create
+          delete: /order/delete
+          update: /order/update
+
