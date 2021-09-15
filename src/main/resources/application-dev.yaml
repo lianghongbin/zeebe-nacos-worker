@@ -21,6 +21,9 @@ management:
     port: 8080
 
 spring:
+  application:
+    name: order-service
+
   cloud:
     nacos:
       discovery:
@@ -31,3 +34,5 @@ spring:
           delete: /order/delete
           update: /order/update
 
+server:
+  port: 8070
