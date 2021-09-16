@@ -9,13 +9,19 @@ import org.springframework.stereotype.Component;
  * @date 9/16/21
  */
 @Component
-public class MicroserviceConfig {
+public class MetadataKeyword {
 
 
     public static String serviceNameKey;
+    public static String serviceUrlSuffix;
 
     @Value( "${service.name.key}" )
     public void setServiceNameKey(String key) {
         serviceNameKey = key;
+    }
+
+    @Value( "${service.urlSuffix.key}")
+    public void setServiceUrlSuffix(String key) {
+        serviceUrlSuffix = key;
     }
 }

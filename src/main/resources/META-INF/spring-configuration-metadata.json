@@ -6,7 +6,7 @@
       "description": "Description for service.name.key."
     },
     {
-      "name": "service.url-suffix.key",
+      "name": "service.urlSuffix.key",
       "type": "java.lang.String",
       "description": "Description for service.name.key."
     }

@@ -32,48 +32,15 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * @author jeffrey
+ */
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableZeebeClient
 public class ZeebeNacosWorkerApplication {
 
-  @Resource
-  private DiscoveryClient nacosDiscoveryClient;
-
-  @Resource
-  private RestTemplate restTemplate;
-
   public static void main(String[] args) {
     SpringApplication.run(ZeebeNacosWorkerApplication.class, args);
-  }
-
-  @ZeebeWorker
-  public void handleFooJob(final JobClient client, final ActivatedJob job) throws IOException, InterruptedException, ExecutionException, TimeoutException {
-
-    String serviceName = job.getCustomHeaders().get("service_name");
-    String uriKey = job.getCustomHeaders().get("uri_key");
-
-    System.out.println(MicroserviceConfig.serviceNameKey);
-    System.out.println(job);
-
-    try {
-      System.out.println("-------------");
-      ServiceInstance instance = nacosDiscoveryClient.getInstances(serviceName).get(0);
-      System.out.println("======" + instance.toString());
-      String uri = instance.getMetadata().get(uriKey);
-
-      String url = "http://" + serviceName + "/" + uri;
-
-      //ServiceInstance serviceInstance = loadBalancerClient.choose("buscien-service-01-app");
-
-      System.out.println("url:" + url);
-
-      String result = restTemplate.getForObject("http://order-service/order/find", String.class);
-      System.out.println("result:====" + result);
-    }catch (Exception e) {
-      System.out.println("error:" + e.getMessage());
-    }
-
-    client.newCompleteCommand(job.getKey()).variables(job.getVariables()).send().join();
   }
 }

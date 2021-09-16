@@ -29,15 +29,14 @@ spring:
         server-addr: 10.0.1.198:8848
         register-enabled: false
         metadata:
-          find: /order/find
-          add: /order/create
-          delete: /order/delete
-          update: /order/update
-
+          find: /order/find;get
+          add: /order/create;post
+          delete: /order/delete;delete
+          update: /order/update;put
 
 service:
   name:
     key: SERVICE_NAME
-  url-suffix:
+  urlSuffix:
     key: URL_SUFFIX_KEY
 
