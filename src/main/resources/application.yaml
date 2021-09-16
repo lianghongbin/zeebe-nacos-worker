@@ -22,8 +22,7 @@ management:
 
 spring:
   application:
-    name: order-service
-
+    name: consumer
   cloud:
     nacos:
       discovery:
@@ -35,4 +34,4 @@ spring:
           update: /order/update
 
 server:
-  port: 8070
+  port: 8071
