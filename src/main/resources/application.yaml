@@ -22,16 +22,22 @@ management:
 
 spring:
   application:
-    name: consumer
+    name: zeebe-nacos-worker
   cloud:
     nacos:
       discovery:
         server-addr: 10.0.1.198:8848
+        register-enabled: false
         metadata:
           find: /order/find
           add: /order/create
           delete: /order/delete
           update: /order/update
 
-server:
-  port: 8071
+
+service:
+  name:
+    key: SERVICE_NAME
+  url-suffix:
+    key: URL_SUFFIX_KEY
+
