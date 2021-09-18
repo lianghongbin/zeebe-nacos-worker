@@ -6,60 +6,62 @@ import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import io.camunda.zeebe.spring.client.annotation.ZeebeWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author jeffrey
  */
-
 @EnableDiscoveryClient
 @EnableZeebeClient
 @Service
 public class ZeebeNacosInvoker {
 
-    @Resource
-    private DiscoveryClient nacosDiscoveryClient;
     private static final Logger logger = LoggerFactory.getLogger(ZeebeNacosInvoker.class);
-
     @Resource
     private RestTemplate restTemplate;
+    @Resource
+    private ServiceRequest.Builder serviceRequestBuilder;
 
     @ZeebeWorker
-    public void handle(final JobClient client, final ActivatedJob job) throws IOException, InterruptedException, ExecutionException, TimeoutException {
-
-        String serviceName = job.getCustomHeaders().get("service_name");
-        String uriKey = job.getCustomHeaders().get("uri_key");
-
-        System.out.println(MetadataKeyword.serviceNameKey);
-        System.out.println(job);
-
+    public void handle(final JobClient client, final ActivatedJob job) throws Exception {
+        ServiceRequest request;
         try {
-            System.out.println("-------------");
-            ServiceInstance instance = nacosDiscoveryClient.getInstances(serviceName).get(0);
-            System.out.println("======" + instance.toString());
-            String uri = instance.getMetadata().get(uriKey);
-
-            String url = "http://" + serviceName + "/" + uri;
-
-            //ServiceInstance serviceInstance = loadBalancerClient.choose("buscien-service-01-app");
-
-            System.out.println("url:" + url);
-
-            String result = restTemplate.getForObject("http://ord/order/find", String.class);
-            System.out.println("result:====" + result);
+            request = serviceRequestBuilder.job(job).build();
         }catch (Exception e) {
-            logger.error("执行微服务出错: {}", e.getMessage());
+            logger.error("微服务参数设置错误: {}", e.toString());
+            client.newFailCommand(job.getKey());
+            return;
         }
 
-        client.newCompleteCommand(job.getKey()).variables(job.getVariables()).send().join();
+        try {
+            switch (request.method()) {
+                case GET:
+                    String result = restTemplate.getForObject(request.url(), String.class, request.variables());
+                    System.out.println(result);
+                    break;
+
+                case POST:
+                    restTemplate.postForObject(request.url(), request.variables(), String.class, request.variables());
+                    break;
+
+                case PUT:
+                    restTemplate.put(request.url(), request.variables(), String.class, request.variables());
+                    break;
+
+                default:
+                    restTemplate.delete(request.url(), request.variables(), String.class, request.variables());
+            }
+
+            client.newCompleteCommand(job.getKey()).variables(job.getVariables()).send().join();
+        }catch (Exception e) {
+            logger.error("执行微服务出错: {}", e.toString());
+            client.newFailCommand(job.getKey());
+        }
     }
 }

@@ -1,13 +1,13 @@
 {
   "properties": [
     {
-      "name": "service.name.key",
+      "name": "zeebe.nacos.service.name",
       "type": "java.lang.String",
-      "description": "Description for service.name.key."
+      "description": "Description for service.name."
     },
     {
-      "name": "service.urlSuffix.key",
+      "name": "zeebe.nacos.service.suffix",
       "type": "java.lang.String",
-      "description": "Description for service.name.key."
+      "description": "Description for service.name."
     }
   ] }

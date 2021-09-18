@@ -13,4 +13,9 @@ public class ApplicationConfiguration {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+    @Bean
+    ServiceRequest.Builder serviceRequestBuilder() {
+        return ServiceRequest.newBuilder();
+    }
 }
