@@ -32,10 +32,4 @@ spring:
     nacos:
       discovery:
         server-addr: 10.0.1.198:8848
-        register-enabled: false
-        metadata:
-          find: /order/find;get;a
-          add: /order/create;post
-          delete: /order/delete;delete
-          update: /order/update;put
-
+        register-enabled: true

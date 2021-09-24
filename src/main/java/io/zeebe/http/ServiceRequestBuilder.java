@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
  * @author eric.liang
  * @date 9/17/21
  */
+@Service
 public class ServiceRequestBuilder implements ServiceRequest.Builder{
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceRequestBuilder.class);
@@ -111,7 +113,7 @@ public class ServiceRequestBuilder implements ServiceRequest.Builder{
 
         if (job == null) {
             if (name == null || name.trim().length() == 0) {
-                logger.error("微服务名称为空");
+                logger.warn("微服务名称为空");
                 throw new ZeebeNacosWorkerException("微服务名称为空");
             }
 
@@ -139,8 +141,8 @@ public class ServiceRequestBuilder implements ServiceRequest.Builder{
                 m = "get";
             }
         }catch (Exception e) {
-            logger.error("没有发现微服务 {} 实例", name);
-            throw  new ZeebeNacosWorkerException("没有发现微服务 " + name + "实例");
+            logger.warn("没有发现微服务 {} 实例", name);
+            throw  new ZeebeNacosWorkerException("没有发现微服务 " + name + " 实例");
         }
 
         try {
