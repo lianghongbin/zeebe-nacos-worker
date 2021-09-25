@@ -18,9 +18,9 @@ import javax.annotation.Resource;
 @EnableDiscoveryClient
 @EnableZeebeClient
 @Service
-public class ZeebeNacosInvoker {
+public class MicroserviceInvoker {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZeebeNacosInvoker.class);
+    private static final Logger logger = LoggerFactory.getLogger(MicroserviceInvoker.class);
     @Resource
     private RestTemplate restTemplate;
     @Resource
@@ -38,7 +38,7 @@ public class ZeebeNacosInvoker {
             return;
         }
 
-
+        logger.info(" invoke " + request.url());
         try {
             switch (request.method()) {
                 case DELETE:
@@ -55,7 +55,7 @@ public class ZeebeNacosInvoker {
 
                 default:
                     String result = restTemplate.getForObject(request.url(), String.class, request.variables());
-                    logger.debug(result);
+                    logger.info(result);
             }
 
             client.newCompleteCommand(job.getKey()).variables(job.getVariables()).send().join();

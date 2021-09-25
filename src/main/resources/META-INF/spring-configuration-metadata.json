@@ -8,6 +8,11 @@
     {
       "name": "zeebe.nacos.service.suffix",
       "type": "java.lang.String",
-      "description": "Description for service.name."
+      "description": "Description for service.suffix."
+    },
+    {
+      "name": "nextop.zeebe.nacos.metadata.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Decide for auto set metadata."
     }
   ] }

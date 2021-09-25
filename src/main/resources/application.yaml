@@ -32,3 +32,9 @@ spring:
 
 server:
   port: 8080
+
+nextop:
+  zeebe:
+    nacos:
+      metadata:
+        enabled: false

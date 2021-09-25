@@ -26,9 +26,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableZeebeClient
-public class ZeebeNacosWorkerApplication {
+public class WorkerApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(ZeebeNacosWorkerApplication.class, args);
+    SpringApplication.run(WorkerApplication.class, args);
   }
 }

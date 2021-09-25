@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  * @date 9/17/21
  */
 @Service
-public class ServiceRequestBuilder implements ServiceRequest.Builder{
+public class ServiceRequestBuilder implements ServiceRequest.Builder {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceRequestBuilder.class);
     private String name;
@@ -24,11 +24,11 @@ public class ServiceRequestBuilder implements ServiceRequest.Builder{
     private ActivatedJob job;
 
     @Resource
-    private ZeebeServiceProperties zeebeServiceProperties;
+    private ServiceMetaProperties serviceMetaProperties;
     @Resource
     private DiscoveryClient nacosDiscoveryClient;
 
-    public ServiceRequestBuilder(){
+    public ServiceRequestBuilder() {
         this.method = Method.GET;
         this.serviceUri = "/";
         this.variables = "{}";
@@ -105,51 +105,57 @@ public class ServiceRequestBuilder implements ServiceRequest.Builder{
 
     /**
      * 构建ServiceRequest
+     *
      * @return ServiceRequest
-     * @throws ZeebeNacosWorkerException 执行异常
+     * @throws WorkerException 执行异常
      */
     @Override
-    public ServiceRequest build() throws ZeebeNacosWorkerException {
+    public ServiceRequest build() throws WorkerException {
 
         if (job == null) {
             if (name == null || name.trim().length() == 0) {
                 logger.warn("微服务名称为空");
-                throw new ZeebeNacosWorkerException("微服务名称为空");
+                throw new WorkerException("微服务名称为空");
             }
 
             return new ImmutableServiceRequest(this);
         }
 
         String m;
-        this.name = job.getCustomHeaders().get(zeebeServiceProperties.getService().getName());
-        String uriKey = job.getCustomHeaders().get(zeebeServiceProperties.getService().getSuffix());
+        this.name = job.getCustomHeaders().get(serviceMetaProperties.getService().getName());
+        String uriKey = job.getCustomHeaders().get(serviceMetaProperties.getService().getSuffix());
         this.variables = job.getVariables();
         if (uriKey == null || uriKey.isBlank()) {
             return new ImmutableServiceRequest(this);
         }
 
+        ServiceInstance instance;
         try {
-            ServiceInstance instance = nacosDiscoveryClient.getInstances(name).get(0);
-            String full = instance.getMetadata().get(uriKey);
-            String[] contents = full.split(";");
-
-            if (contents.length >= 2) {
-                serviceUri = contents[0];
-                m = contents[1];
-            } else {
-                serviceUri = contents[0];
-                m = "get";
-            }
-        }catch (Exception e) {
+            instance = nacosDiscoveryClient.getInstances(name).get(0);
+        } catch (Exception e) {
             logger.warn("没有发现微服务 {} 实例", name);
-            throw  new ZeebeNacosWorkerException("没有发现微服务 " + name + " 实例");
+            throw new WorkerException("没有发现微服务 " + name + " 实例");
+        }
+        String full = instance.getMetadata().get(uriKey);
+        if (full == null) {
+            throw new WorkerException("没有对应的微服务方法 " + uriKey);
+        }
+
+        String[] contents = full.split(";");
+
+        if (contents.length >= 2) {
+            serviceUri = contents[0];
+            m = contents[1];
+        } else {
+            serviceUri = contents[0];
+            m = "get";
         }
 
         try {
             method = Method.valueOf(m.toUpperCase());
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("获取微服务请求方法错误, method={}", method);
-            throw new ZeebeNacosWorkerException("获取微服务请求方法错误,method=" + method);
+            throw new WorkerException("获取微服务请求方法错误,method=" + method);
         }
 
         return new ImmutableServiceRequest(this);

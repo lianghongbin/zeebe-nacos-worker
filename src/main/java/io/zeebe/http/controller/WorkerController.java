@@ -19,4 +19,9 @@ public class WorkerController {
     public String consumer() {
         return "consumer controller";
     }
+
+    @GetMapping()
+    public String work() {
+        return "working";
+    }
 }

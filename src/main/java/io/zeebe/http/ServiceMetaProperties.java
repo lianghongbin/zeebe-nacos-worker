@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "zeebe.nacos")
-public class ZeebeServiceProperties {
+public class ServiceMetaProperties {
 
     @NestedConfigurationProperty
     private Service service = new Service();
