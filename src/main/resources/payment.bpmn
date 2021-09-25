@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0jj7e6k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Zeebe Modeler" exporterVersion="0.11.0">
+  <bpmn:process id="order-process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0eft3dx</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1h51ks4">
+      <bpmn:incoming>Flow_09dxlnf</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0eft3dx" sourceRef="StartEvent_1" targetRef="payment-process" />
+    <bpmn:sequenceFlow id="Flow_09dxlnf" sourceRef="payment-process" targetRef="Event_1h51ks4" />
+    <bpmn:serviceTask id="payment-process" name="Payment">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="nacos_service" />
+        <zeebe:taskHeaders>
+          <zeebe:header key="SERVICE_NAME" value="order-provider" />
+          <zeebe:header key="METHOD_NAME" value="pay" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0eft3dx</bpmn:incoming>
+      <bpmn:outgoing>Flow_09dxlnf</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="order-process">
+      <bpmndi:BPMNEdge id="Flow_0eft3dx_di" bpmnElement="Flow_0eft3dx">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="310" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09dxlnf_di" bpmnElement="Flow_09dxlnf">
+        <di:waypoint x="410" y="117" />
+        <di:waypoint x="532" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1h51ks4_di" bpmnElement="Event_1h51ks4">
+        <dc:Bounds x="532" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vko6xj_di" bpmnElement="payment-process">
+        <dc:Bounds x="310" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

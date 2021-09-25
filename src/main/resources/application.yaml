@@ -13,17 +13,13 @@ zeebe:
   nacos:
     service:
       name: SERVICE_NAME
-      suffix: URL_SUFFIX_KEY
+      suffix: METHOD_NAME
 
 logging:
   level:
     root: ERROR
     io.zeebe: INFO
     io.zeebe.http: DEBUG
-
-management:
-  server:
-    port: 8080
 
 spring:
   application:
@@ -33,3 +29,6 @@ spring:
       discovery:
         server-addr: 10.0.1.198:8848
         register-enabled: true
+
+server:
+  port: 8080

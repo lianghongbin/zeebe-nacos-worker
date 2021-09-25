@@ -1,5 +1,7 @@
 package io.zeebe.http.metadata;
 
+import com.alibaba.cloud.nacos.NacosDiscoveryProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -20,82 +22,77 @@ import java.util.Map;
  * @author eric.liang
  * @date 9/23/21
  */
-@Component
-public class AnnotationScanner implements ApplicationListener<ContextRefreshedEvent> {
+public class AnnotationScanner{
 
-    @Resource
-    MetadataManager metadataManager;
+    private final ApplicationContext context;
+    private final NacosDiscoveryProperties properties;
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public AnnotationScanner(ApplicationContext context, NacosDiscoveryProperties properties) {
+        this.context = context;
+        this.properties = properties;
+    }
 
-        if (event.getApplicationContext().getParent() == null) {
+    public void scan() {
+        StringBuilder urlPrefix = new StringBuilder("");
+        StringBuilder orgMethod = new StringBuilder();
 
-            StringBuilder urlPrefix = new StringBuilder("");
-            StringBuilder orgMethod = new StringBuilder();
+        Map<String, Object> objectMap = context.getBeansWithAnnotation(RestController.class);
+        objectMap.forEach((k, v) -> {
+            RequestMapping requestMapping = AnnotationUtils.findAnnotation(v.getClass(), RequestMapping.class);
+            if (requestMapping != null) {
+                urlPrefix.append(getValue(requestMapping));
+                orgMethod.append(getMethod(requestMapping));
+            }
 
-            Map<String, Object> objectMap = event.getApplicationContext().getBeansWithAnnotation(RestController.class);
-            objectMap.forEach((k, v) ->{
-                RequestMapping requestMapping = AnnotationUtils.findAnnotation(v.getClass(), RequestMapping.class);
-                if (requestMapping != null) {
-                    urlPrefix.append(getValue(requestMapping));
-                    orgMethod.append(getMethod(requestMapping));
-                    System.out.println("========" + requestMapping.value()[0]);
+            Method[] methods = ReflectionUtils.getAllDeclaredMethods(v.getClass());
+            for (Method method : methods) {
+                StringBuilder url = new StringBuilder(urlPrefix);
+                RequestMapping r = method.getAnnotation(RequestMapping.class); //如果方法上直接有 RequestMapping注解
+                if (r != null) {
+                    url.append(getValue(r));
+                    url.append(";");
+
+                    String tempM = getMethod(r);
+                    if ("".equals(tempM)) {
+                        url.append(orgMethod);
+                    } else {
+                        url.append(tempM);
+                    }
+
+                    properties.getMetadata().put(method.getName(), url.toString());
+                    continue;
                 }
 
-                Method[] methods = ReflectionUtils.getAllDeclaredMethods(v.getClass());
-                for (Method method : methods) {
-                    StringBuilder url = new StringBuilder(urlPrefix);
-                    RequestMapping r = method.getAnnotation(RequestMapping.class); //如果方法上直接有 RequestMapping注解
+                for (Annotation a : method.getDeclaredAnnotations()) {
+                    r = a.annotationType().getDeclaredAnnotation(RequestMapping.class);
                     if (r != null) {
-                        url.append(getValue(r));
+                        String[] values = (String[]) getAnnotationValue(a, "value");
+                        String tempV = values.length == 0 ? "" : values[0];
+
+                        url.append(tempV);
                         url.append(";");
 
                         String tempM = getMethod(r);
                         if (tempM.equals("")) {
                             url.append(orgMethod);
-                        }
-                        else {
+                        } else {
                             url.append(tempM);
                         }
 
-                        metadataManager.put(method.getName(), url.toString());
-                        continue;
-                    }
-
-                    for(Annotation a : method.getDeclaredAnnotations()) {
-                        System.out.println(a.annotationType());
-
-                        r = a.annotationType().getDeclaredAnnotation(RequestMapping.class);
-                        if (r != null) {
-                            String[] values = (String[])getAnnotationValue(a, "value");
-                            String tempV = values.length == 0 ? "" : values[0];
-
-                            url.append(tempV);
-                            url.append(";");
-
-                            String tempM = getMethod(r);
-                            if (tempM.equals("")) {
-                                url.append(orgMethod);
-                            }
-                            else {
-                                url.append(tempM);
-                            }
-
-                            metadataManager.put(method.getName(), url.toString());
-                            System.out.println("############ " + r.annotationType());
-                            break;
-                        }
+                        properties.getMetadata().put(method.getName(), url.toString());
+                        break;
                     }
                 }
-            });
-        }
+            }
+        });
+
     }
+
     public static Object getAnnotationValue(Annotation annotation, String property) {
         Object result = null;
         if (annotation != null) {
-            InvocationHandler invo = Proxy.getInvocationHandler(annotation); //获取被代理的对象
-            Map map = (Map) getFieldValue(invo, "memberValues");
+            InvocationHandler handler = Proxy.getInvocationHandler(annotation);
+            Map map = (Map) getFieldValue(handler, "memberValues");
             if (map != null) {
                 result = map.get(property);
             }
