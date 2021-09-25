@@ -10,7 +10,7 @@ import javax.annotation.Resource;
  * @date 9/23/21
  */
 @RestController
-@RequestMapping(value = "/order", method = RequestMethod.POST)
+@RequestMapping(value = "/order")
 public class WorkerController {
 
 

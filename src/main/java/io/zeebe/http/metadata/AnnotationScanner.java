@@ -2,15 +2,11 @@ package io.zeebe.http.metadata;
 
 import com.alibaba.cloud.nacos.NacosDiscoveryProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -73,7 +69,7 @@ public class AnnotationScanner{
                         url.append(";");
 
                         String tempM = getMethod(r);
-                        if (tempM.equals("")) {
+                        if ("".equals(tempM)) {
                             url.append(orgMethod);
                         } else {
                             url.append(tempM);

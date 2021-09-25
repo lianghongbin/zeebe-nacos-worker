@@ -41,9 +41,8 @@ public class ZeebeNacosInvoker {
 
         try {
             switch (request.method()) {
-                case GET:
-                    String result = restTemplate.getForObject(request.url(), String.class, request.variables());
-                    System.out.println(result);
+                case DELETE:
+                    restTemplate.delete(request.url(), request.variables(), String.class, request.variables());
                     break;
 
                 case POST:
@@ -55,12 +54,13 @@ public class ZeebeNacosInvoker {
                     break;
 
                 default:
-                    restTemplate.delete(request.url(), request.variables(), String.class, request.variables());
+                    String result = restTemplate.getForObject(request.url(), String.class, request.variables());
+                    logger.debug(result);
             }
 
             client.newCompleteCommand(job.getKey()).variables(job.getVariables()).send().join();
         }catch (Exception e) {
-            logger.warn("执行微服务异常: {}", e.toString());
+            logger.error("执行微服务异常: {}", e.toString());
             client.newFailCommand(job.getKey());
         }
     }
