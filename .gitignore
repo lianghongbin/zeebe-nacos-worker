@@ -21,4 +21,7 @@ trace.out
 .coverage/
 .logs/
 *.iml
+*.iws
+*.ipr
+.svn
 /target/

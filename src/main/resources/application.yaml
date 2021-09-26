@@ -16,10 +16,7 @@ zeebe:
       suffix: METHOD_NAME
 
 logging:
-  level:
-    root: ERROR
-    io.zeebe: INFO
-    io.zeebe.http: DEBUG
+  config: classpath:log4j2.xml
 
 spring:
   application:
@@ -37,4 +34,4 @@ nextop:
   zeebe:
     nacos:
       metadata:
-        enabled: false
+        enabled: true

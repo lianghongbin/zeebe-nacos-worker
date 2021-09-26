@@ -1,8 +1,4 @@
-package io.zeebe.http;
-
-import com.fasterxml.jackson.databind.util.JSONPObject;
-
-import java.util.Map;
+package com.nextop.zeebe.nacos;
 
 /**
  * @author eric.liang

@@ -1,9 +1,9 @@
-package io.zeebe.http;
+package com.nextop.zeebe.nacos;
 
 /**
  * @author jeffrey
  */
-public class WorkerException extends RuntimeException{
+public class WorkerException extends Exception{
 
     public WorkerException(){
         super();

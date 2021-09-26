@@ -1,22 +1,23 @@
-package io.zeebe.http;
+package com.nextop.zeebe.nacos;
 
+import com.nextop.zeebe.nacos.config.ServiceMetaProperties;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author eric.liang
  * @date 9/17/21
  */
+@Slf4j
 @Service
 public class ServiceRequestBuilder implements ServiceRequest.Builder {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceRequestBuilder.class);
     private String name;
     private Method method;
     private String serviceUri;
@@ -114,7 +115,7 @@ public class ServiceRequestBuilder implements ServiceRequest.Builder {
 
         if (job == null) {
             if (name == null || name.trim().length() == 0) {
-                logger.warn("微服务名称为空");
+                log.warn("微服务名称为空");
                 throw new WorkerException("微服务名称为空");
             }
 
@@ -131,9 +132,10 @@ public class ServiceRequestBuilder implements ServiceRequest.Builder {
 
         ServiceInstance instance;
         try {
-            instance = nacosDiscoveryClient.getInstances(name).get(0);
+            List<ServiceInstance> instances = nacosDiscoveryClient.getInstances(name);
+            instance = instances.get(0);
         } catch (Exception e) {
-            logger.warn("没有发现微服务 {} 实例", name);
+            log.warn("没有发现微服务 {} 实例", name);
             throw new WorkerException("没有发现微服务 " + name + " 实例");
         }
         String full = instance.getMetadata().get(uriKey);
@@ -154,7 +156,7 @@ public class ServiceRequestBuilder implements ServiceRequest.Builder {
         try {
             method = Method.valueOf(m.toUpperCase());
         } catch (Exception e) {
-            logger.error("获取微服务请求方法错误, method={}", method);
+            log.error("获取微服务请求方法错误, method={}", method);
             throw new WorkerException("获取微服务请求方法错误,method=" + method);
         }
 

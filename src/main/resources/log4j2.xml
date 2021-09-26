@@ -8,10 +8,10 @@
   </Appenders>
 
   <Loggers>
-    <Logger name="io.zeebe" level="info"/>
-    <Logger name="io.zeebe.http" level="debug"/>
+    <Logger name="com.nextop" level="info"/>
+    <Logger name="com.nextop.zeebe.nacos" level="debug"/>
 
-    <Root level="info">
+    <Root level="warn">
       <AppenderRef ref="Console"/>
     </Root>
   </Loggers>

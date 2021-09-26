@@ -1,4 +1,4 @@
-package io.zeebe.http;
+package com.nextop.zeebe.nacos;
 
 import com.google.gson.Gson;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
@@ -35,7 +35,7 @@ public abstract class ServiceRequest {
 
         Builder job(ActivatedJob job);
 
-        ServiceRequest build();
+        ServiceRequest build() throws WorkerException;
     }
 
     public static ServiceRequest.Builder newBuilder(String name) {

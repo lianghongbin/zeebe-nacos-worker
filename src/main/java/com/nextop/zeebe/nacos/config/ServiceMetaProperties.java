@@ -1,4 +1,4 @@
-package io.zeebe.http;
+package com.nextop.zeebe.nacos.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;

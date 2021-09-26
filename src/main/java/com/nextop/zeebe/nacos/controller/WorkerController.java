@@ -1,4 +1,4 @@
-package io.zeebe.http.controller;
+package com.nextop.zeebe.nacos.controller;
 
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ public class WorkerController {
         return "consumer controller";
     }
 
-    @GetMapping()
+    @GetMapping("/work")
     public String work() {
         return "working";
     }

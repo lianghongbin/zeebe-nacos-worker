@@ -1,4 +1,4 @@
-package io.zeebe.http;
+package com.nextop.zeebe.nacos;
 
 /**
  * @author jeffrey
