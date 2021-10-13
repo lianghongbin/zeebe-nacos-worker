@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @Slf4j
 @Configuration
-public class WorkAutoConfiguration {
+public class WorkerAutoConfiguration {
 
     @Bean
     @LoadBalanced
